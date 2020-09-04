@@ -1,0 +1,53 @@
+Title: Indigency "Flowchart"
+Author: [Sarah Howie]
+Before: <link rel="stylesheet" type="text/css" href="https://suffolklitlab.org/howto/qna/style/style.css">
+<div id="icon" style="background-size: 110px 99px;background-image: url('https://suffolklitlab.org/howto/qna/images/maxheadroom.gif');"></div>
+<h2 style="text-align:center;">Indigency "Flowchart"</h2>
+<p><b>This is a <a href="https://www.codingthelaw.org/level/2/#mission_p1">class project</a>. You should not rely on it as a source of legal information!</b></p>
+<p>Answer the following questions to see if you qualify for appointed counsel in Colorado.</p>
+
+After:
+<script>
+function fedpov(house,income,percentage){
+	// Determines if your income is less than or equal to
+	// a percentage of the 2020 federal poverty guidelines
+	// for the contiguous United States. See
+	// https://aspe.hhs.gov/poverty-guidelines
+
+		var line = NaN;
+
+		if (house == 1) {
+			line = 12760;
+		} else if (house == 2) {
+			line = 17240;
+		} else if (house == 3) {
+			line = 21720;
+		} else if (house == 4) {
+			line = 26200;
+		} else if (house == 5) {
+			line = 30680;
+		} else if (house == 6) {
+			line = 35160;
+		} else if (house == 7) {
+			line = 39640;
+		} else if (house == 8) {
+			line = 44120;
+		} else if (house > 8) {
+			line = 44120 + (house-8)*4480;
+		}
+
+		if (income <= (line*(percentage/100))) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+</script>
+
+Q(house):Including you, how many related family members live in your household?
+X:number
+	Q(income): How much gross income does your household bring in per year?
+	X[javascript:if (fedpov(getvar('house'),getvar('income'),125)){ goto('eligible') } else if (fedpov(getvar('house'),getvar('income'),218)) { goto('maybeeligible') } else { goto('noteligible') } ]:number
+Q(eligible):You are eligible to have counsel assigned to you. There is a $25 processing fee.
+Q(maybeeligible):You MAY be eligible to have counsel assigned to you. The court will determine what costs, if any, you will be required to repay.
+Q(noteligible):You are not eligible to have counsel assigned to you.

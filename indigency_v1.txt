@@ -8,7 +8,7 @@ Before: <link rel="stylesheet" type="text/css" href="https://suffolklitlab.org/h
 
 Q(1):Do you live with related family members?
 A:Yes
-	Q(1.1):GOTO:Family
+	Q(1.1):GOTO:family
 A:No
 	Q(1.2):GOTO:onelow
 Q(onelow): Is your total monthly income less than $1,329? This includes all gross wages, unemployment benefits, and Social Security Supplemental Income.
