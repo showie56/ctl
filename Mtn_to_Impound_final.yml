@@ -1,0 +1,204 @@
+include:
+  - docassemble.MAVirtualCourt:basic-questions.yml
+---
+comment: |
+  The metadata section controls the tab title and saved interview title. You can delete this section if you include this YAML file in another YAML file.
+metadata:
+  title: |
+    Motion to Impound Information
+  short title: |
+    Mtn to Impound
+---
+comment: |
+  This section is used by MAVirtualCourts to control how some of the questions work.
+mandatory: True
+code: |
+  interview_metadata # make sure we initialize the object
+  if not defined("interview_metadata['Mtn_to_Impound_final']"):
+    interview_metadata.initializeObject('Mtn_to_Impound_final')
+  interview_metadata['Mtn_to_Impound_final'].update({
+    'title': 'Motion to Impound Information',
+    'short title': 'Mtn to Impound',
+    'description': 'This motion is used to ask the court to prevent the other party from gaining access to certain information',
+    'original_form': '',
+    'allowed courts': [
+      'Probate and Family Court',
+    ],
+    'categories': [
+      'Domestic Violence / Safety of self',
+      'Family Law',
+    ],
+    'logic block variable': 'Mtn_to_Impound_final',
+    'attachment block variable': 'Mtn_to_Impound_final_attachment',
+    'typical role': 'unknown',
+  })
+---
+features:
+  navigation: True
+---
+sections:
+  - review_Mtn_to_Impound_final: Review your answers
+---
+id: interview_order_Mtn_to_Impound_final
+code: |
+  # This is a placeholder to control logic flow in this interview
+
+  basic_questions_intro_screen 
+  Mtn_to_Impound_final_intro
+  # Set the allowed courts for this interview
+  allowed_courts = interview_metadata["Mtn_to_Impound_final"]["allowed courts"]
+  nav.set_section('review_Mtn_to_Impound_final')
+  # Below sets the user_role by asking a question.
+  # You can set user_role directly instead to either 'plaintiff' or 'defendant'
+  user_ask_role
+  user_name
+  other_parties_address_state
+  court_county
+  set_progress(12.5)
+  affidavit_narrative
+  # Set the answer file name.
+  set_parts(subtitle=str(users))
+  signature_date
+  set_progress(25.0)
+  str(defendants)
+  str(plaintiffs)
+  str(other_parties)
+  # Save (anonymized) interview statistics.
+  store_variables_snapshot(data={'zip': users[0].address.zip})
+  Mtn_to_Impound_final_preview_question # Pre-canned preview screen
+  basic_questions_signature_flow
+  Mtn_to_Impound_final = True
+---
+comment: |
+  This question is used to introduce your interview. Please customize
+id: Motion to Impound Information
+continue button field: Mtn_to_Impound_final_intro
+question: |
+  Motion to Impound Information
+subquestion: |
+  This motion is used to ask the court to prevent the other party from gaining access to certain information
+---
+id: Review your form before you sign it
+continue button field: Mtn_to_Impound_final_preview_question
+question: |
+  Review your form before you sign it
+subquestion: |
+  Here is a preview of the form you'll sign on the next page. 
+  
+   ${ pdf_concatenate(Mtn_to_Impound_final_attachment['preview'], filename='Mtn_to_Impound_final.pdf')}
+---
+id: Your information
+question: |
+  Your information
+subquestion: |
+  The court needs basic information to know who you are
+fields:
+  - 'What is your first and last name?': str(users[0])
+---
+id: Other Party s information
+question: |
+  Other Party's information
+subquestion: |
+  The court needs information about the other party in this case
+fields:
+  - 'What state does the other party live in?': other_parties_address_state
+  - "What is the other party's zip code?": other_parties_address_zip
+  - "What is the other party's street address?": other_parties_address_street
+---
+id: Case Information
+question: |
+  Case Information
+subquestion: |
+  The court needs to know what case this motion is associated with
+fields:
+  - 'What county is this case filed in?': courts[0].address.county
+  - 'What is the docket number for this case?': docket_numbers
+---
+id: Information to Impound
+question: |
+  Information to Impound
+subquestion: |
+  The court needs to know what information you are seeking to impound and why
+fields:
+  - 'What information can you provide the court as to why this information should not be shared with the other party?': affidavit_narrative
+    input type: area
+  - 'What information are you seeking to prevent the other party from accessing?': impound_list
+---
+progress: 100
+mandatory: True
+id: Your form is ready to download and file
+question: |
+  Your form is ready to download and file
+subquestion: |
+  Thank you ${users}. Your form is ready to download and deliver.
+  
+  Below is a preview of your form.
+  
+  ${pdf_concatenate(Mtn_to_Impound_final_attachment['final'], filename='Mtn_to_Impound_final.pdf') }
+need: Mtn_to_Impound_final
+attachment code: Mtn_to_Impound_final_attachment['final']
+---
+objects:
+  - Mtn_to_Impound_final_attachment: DADict
+---
+attachment:
+    variable name: Mtn_to_Impound_final_attachment[i]
+    name: Mtn to Impound
+    filename: Mtn_to_Impound
+    docx template file: Mtn_to_Impound_final.docx
+---
+id: Mtn_to_Impound_final review screen
+event: review_Mtn_to_Impound_final
+question: |
+  Placeholder Review Screen
+subquestion: |
+  Edit your answers below
+review: 
+  - Edit: affidavit_narrative
+    button: |
+      What information can you provide the court as to why this information should not be shared with the other party?:
+      > ${ single_paragraph(affidavit_narrative) }
+  - Edit: users[0]
+    button: |
+      What is your first and last name?:
+      ${ users[0] }
+  - Edit: other_parties_address_state
+    button: |
+      What state does the other party live in?:
+      ${ other_parties_address_state }
+  - Edit: other_parties_address_zip
+    button: |
+      What is the other party's zip code?:
+      ${ other_parties_address_zip }
+  - Edit: courts[0].address.county
+    button: |
+      What county is this case filed in?:
+      ${ courts[0].address.county }
+  - Edit: impound_list
+    button: |
+      What information are you seeking to prevent the other party from accessing?:
+      ${ impound_list }
+  - Edit: other_parties_address_street
+    button: |
+      What is the other party's street address?:
+      ${ other_parties_address_street }
+  - Edit: docket_numbers
+    button: |
+      What is the docket number for this case?:
+      ${ docket_numbers }
+  - Edit: signature_date
+    button: |
+      signature_date:
+      ${ signature_date }
+  - Edit: defendants[0].name.first
+    button: |
+      defendants:
+      ${ defendants }
+  - Edit: plaintiffs[0].name.first
+    button: |
+      plaintiffs:
+      ${ plaintiffs }
+  - Edit: other_parties[0].name.first
+    button: |
+      other_parties:
+      ${ other_parties }
